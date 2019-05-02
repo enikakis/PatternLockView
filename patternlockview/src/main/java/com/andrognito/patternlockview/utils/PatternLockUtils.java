@@ -269,4 +269,142 @@ public class PatternLockUtils {
 
         return result;
     }
+
+    public static ArrayList<PatternLockView.Dot> generateRandomPatternLock(PatternLockView patternLockView,
+                                                                       int size, int maxSize)
+            throws IndexOutOfBoundsException {
+        if (patternLockView == null) {
+            throw new IllegalArgumentException("PatternLockView can not be null.");
+        }
+
+        if (size <= 0 || size > maxSize) {
+            throw new IndexOutOfBoundsException("Size must be in range [1, " +
+                    maxSize + "]");
+        }
+
+        List<Integer> usedIds = new ArrayList<>();
+        int lastId = RandomUtils.randInt(patternLockView.getDotCount());
+        usedIds.add(lastId);
+
+        while (usedIds.size() < size) {
+            // We start from an empty matrix, so there's always a break point to
+            // exit this loop
+            final int lastRow = lastId / patternLockView.getDotCount();
+            final int lastCol = lastId % patternLockView.getDotCount();
+
+            // This is the max available rows/ columns that we can reach from
+            // the cell of `lastId` to the border of the matrix.
+            final int maxDistance = Math.max(
+                    Math.max(lastRow, patternLockView.getDotCount() - lastRow),
+                    Math.max(lastCol, patternLockView.getDotCount() - lastCol));
+
+            lastId = -1;
+
+            // Starting from `distance` = 1, find the closest-available
+            // neighbour value of the cell [lastRow, lastCol].
+            for (int distance = 1; distance <= maxDistance; distance++) {
+
+                // Now we have a square surrounding the current cell. We call it
+                // ABCD, in which A is top-left, and C is bottom-right.
+                final int rowA = lastRow - distance;
+                final int colA = lastCol - distance;
+                final int rowC = lastRow + distance;
+                final int colC = lastCol + distance;
+
+                int[] randomValues;
+
+                // Process randomly AB, BC, CD, and DA. Break the loop as soon
+                // as we find one value.
+                final int[] lines = RandomUtils.randIntArray(4);
+                for (int line : lines) {
+                    switch (line) {
+                        case 0: {
+                            if (rowA >= 0) {
+                                randomValues = RandomUtils.randIntArray(Math.max(0, colA),
+                                        Math.min(patternLockView.getDotCount(),
+                                                colC + 1));
+                                for (int c : randomValues) {
+                                    lastId = rowA * patternLockView.getDotCount()
+                                            + c;
+                                    if (usedIds.contains(lastId))
+                                        lastId = -1;
+                                    else
+                                        break;
+                                }
+                            }
+
+                            break;
+                        }
+
+                        case 1: {
+                            if (colC < patternLockView.getDotCount()) {
+                                randomValues = RandomUtils.randIntArray(Math.max(0, rowA + 1),
+                                        Math.min(patternLockView.getDotCount(),
+                                                rowC + 1));
+                                for (int r : randomValues) {
+                                    lastId = r * patternLockView.getDotCount()
+                                            + colC;
+                                    if (usedIds.contains(lastId))
+                                        lastId = -1;
+                                    else
+                                        break;
+                                }
+                            }
+
+                            break;
+                        }
+
+                        case 2: {
+                            if (rowC < patternLockView.getDotCount()) {
+                                randomValues = RandomUtils.randIntArray(Math.max(0, colA),
+                                        Math.min(patternLockView.getDotCount(),
+                                                colC));
+                                for (int c : randomValues) {
+                                    lastId = rowC * patternLockView.getDotCount()
+                                            + c;
+                                    if (usedIds.contains(lastId))
+                                        lastId = -1;
+                                    else
+                                        break;
+                                }
+                            }
+
+                            break;
+                        }
+
+                        case 3: {
+                            if (colA >= 0) {
+                                randomValues = RandomUtils.randIntArray(Math.max(0, rowA + 1),
+                                        Math.min(patternLockView.getDotCount(),
+                                                rowC));
+                                for (int r : randomValues) {
+                                    lastId = r * patternLockView.getDotCount()
+                                            + colA;
+                                    if (usedIds.contains(lastId))
+                                        lastId = -1;
+                                    else
+                                        break;
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+
+                    if (lastId >= 0) break;
+                }
+
+                if (lastId >= 0) break;
+            }
+
+            usedIds.add(lastId);
+        }
+
+        ArrayList<PatternLockView.Dot> result = new ArrayList<>();
+        for (int id : usedIds) {
+            result.add(PatternLockView.Dot.of(id));
+        }
+
+        return result;
+    }
 }

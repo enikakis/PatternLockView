@@ -554,6 +554,16 @@ public class PatternLockView extends View {
         setViewMode(patternViewMode);
     }
 
+    public void setPatternLock(@PatternViewMode int patternViewMode, List<Dot> pattern, Long time ) {
+        mPattern.clear();
+        mPattern.addAll(pattern);
+        clearPatternDrawLookup();
+        for (Dot dot : pattern) {
+            mPatternDrawLookup[dot.mRow][dot.mColumn] = true;
+        }
+        setViewMode(patternViewMode);
+    }
+
     /**
      * Set the display mode of the current pattern. This can be useful, for
      * instance, after detecting a pattern to tell this view whether change the
@@ -574,6 +584,24 @@ public class PatternLockView extends View {
             clearPatternDrawLookup();
         }
         invalidate();
+    }
+
+    public int setViewModeLock(@PatternViewMode int patternViewMode, Long time) {
+        mPatternViewMode = patternViewMode;
+        if (patternViewMode == AUTO_DRAW) {
+            if (mPattern.size() == 0) {
+                throw new IllegalStateException(
+                        "you must have a pattern to "
+                                + "animate if you want to set the display mode to animate");
+            }
+            mAnimatingPeriodStart = SystemClock.elapsedRealtime();
+            final Dot first = mPattern.get(0);
+            mInProgressX = getCenterXForColumn(first.mColumn);
+            mInProgressY = getCenterYForRow(first.mRow);
+            clearPatternDrawLookup();
+        }
+        invalidate();
+        return 0;
     }
 
     public void setDotCount(int dotCount) {
@@ -768,6 +796,15 @@ public class PatternLockView extends View {
                 mPatternDrawLookup[i][j] = false;
             }
         }
+    }
+
+    private int clearPatternDrawLookupLock() {
+        for (int i = 0; i < sDotCount; i++) {
+            for (int j = 0; j < sDotCount; j++) {
+                mPatternDrawLookup[i][j] = false;
+            }
+        }
+        return 0;
     }
 
     /**
