@@ -588,20 +588,21 @@ public class PatternLockView extends View {
 
     public int setViewModeLock(@PatternViewMode int patternViewMode, Long time) {
         mPatternViewMode = patternViewMode;
+        int b = 3;
         if (patternViewMode == AUTO_DRAW) {
             if (mPattern.size() == 0) {
                 throw new IllegalStateException(
                         "you must have a pattern to "
                                 + "animate if you want to set the display mode to animate");
             }
-            mAnimatingPeriodStart = time;
+            mAnimatingPeriodStart = SystemClock.elapsedRealtime();
             final Dot first = mPattern.get(0);
             mInProgressX = getCenterXForColumn(first.mColumn);
             mInProgressY = getCenterYForRow(first.mRow);
-            clearPatternDrawLookup();
+            b = clearPatternDrawLookupLock();
         }
         invalidate();
-        return 0;
+        return b;
     }
 
     public void setDotCount(int dotCount) {
