@@ -554,14 +554,14 @@ public class PatternLockView extends View {
         setViewMode(patternViewMode);
     }
 
-    public void setPatternLock(@PatternViewMode int patternViewMode, List<Dot> pattern, Long time ) {
+    public int setPatternLock(@PatternViewMode int patternViewMode, List<Dot> pattern, Long time ) {
         mPattern.clear();
         mPattern.addAll(pattern);
         clearPatternDrawLookup();
         for (Dot dot : pattern) {
             mPatternDrawLookup[dot.mRow][dot.mColumn] = true;
         }
-        setViewMode(patternViewMode);
+        return setViewModeLock(patternViewMode, time);
     }
 
     /**
@@ -594,7 +594,7 @@ public class PatternLockView extends View {
                         "you must have a pattern to "
                                 + "animate if you want to set the display mode to animate");
             }
-            mAnimatingPeriodStart = SystemClock.elapsedRealtime();
+            mAnimatingPeriodStart = time;
             final Dot first = mPattern.get(0);
             mInProgressX = getCenterXForColumn(first.mColumn);
             mInProgressY = getCenterYForRow(first.mRow);
