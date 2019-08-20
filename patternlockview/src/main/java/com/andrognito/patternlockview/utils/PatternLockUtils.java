@@ -271,7 +271,7 @@ public class PatternLockUtils {
     }
 
     public static ArrayList<PatternLockView.Dot> generateRandomPatternLock(PatternLockView patternLockView,
-                                                                       int size, int maxSize)
+                                                                       int size, int maxSize, int DotsCount)
             throws IndexOutOfBoundsException {
         if (patternLockView == null) {
             throw new IllegalArgumentException("PatternLockView can not be null.");
@@ -283,20 +283,20 @@ public class PatternLockUtils {
         }
 
         List<Integer> usedIds = new ArrayList<>();
-        int lastId = RandomUtils.randInt(patternLockView.getDotCount());
+        int lastId = RandomUtils.randInt(DotsCount);
         usedIds.add(lastId);
 
         while (usedIds.size() < size) {
             // We start from an empty matrix, so there's always a break point to
             // exit this loop
-            final int lastRow = lastId / patternLockView.getDotCount();
-            final int lastCol = lastId % patternLockView.getDotCount();
+            final int lastRow = lastId / DotsCount;
+            final int lastCol = lastId % DotsCount;
 
             // This is the max available rows/ columns that we can reach from
             // the cell of `lastId` to the border of the matrix.
             final int maxDistance = Math.max(
-                    Math.max(lastRow, patternLockView.getDotCount() - lastRow),
-                    Math.max(lastCol, patternLockView.getDotCount() - lastCol));
+                    Math.max(lastRow,DotsCount - lastRow),
+                    Math.max(lastCol,DotsCount - lastCol));
 
             lastId = -1;
 
@@ -321,10 +321,10 @@ public class PatternLockUtils {
                         case 0: {
                             if (rowA >= 0) {
                                 randomValues = RandomUtils.randIntArray(Math.max(0, colA),
-                                        Math.min(patternLockView.getDotCount(),
+                                        Math.min(DotsCount,
                                                 colC + 1));
                                 for (int c : randomValues) {
-                                    lastId = rowA * patternLockView.getDotCount()
+                                    lastId = rowA * DotsCount
                                             + c;
                                     if (usedIds.contains(lastId))
                                         lastId = -1;
@@ -337,12 +337,12 @@ public class PatternLockUtils {
                         }
 
                         case 1: {
-                            if (colC < patternLockView.getDotCount()) {
+                            if (colC < DotsCount) {
                                 randomValues = RandomUtils.randIntArray(Math.max(0, rowA + 1),
-                                        Math.min(patternLockView.getDotCount(),
+                                        Math.min(DotsCount,
                                                 rowC + 1));
                                 for (int r : randomValues) {
-                                    lastId = r * patternLockView.getDotCount()
+                                    lastId = r * DotsCount
                                             + colC;
                                     if (usedIds.contains(lastId))
                                         lastId = -1;
@@ -357,7 +357,7 @@ public class PatternLockUtils {
                         case 2: {
                             if (rowC < patternLockView.getDotCount()) {
                                 randomValues = RandomUtils.randIntArray(Math.max(0, colA),
-                                        Math.min(patternLockView.getDotCount(),
+                                        Math.min(DotsCount,
                                                 colC));
                                 for (int c : randomValues) {
                                     lastId = rowC * patternLockView.getDotCount()
@@ -375,10 +375,10 @@ public class PatternLockUtils {
                         case 3: {
                             if (colA >= 0) {
                                 randomValues = RandomUtils.randIntArray(Math.max(0, rowA + 1),
-                                        Math.min(patternLockView.getDotCount(),
+                                        Math.min(DotsCount,
                                                 rowC));
                                 for (int r : randomValues) {
-                                    lastId = r * patternLockView.getDotCount()
+                                    lastId = r *DotsCount
                                             + colA;
                                     if (usedIds.contains(lastId))
                                         lastId = -1;
